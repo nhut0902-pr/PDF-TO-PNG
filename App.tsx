@@ -3,6 +3,9 @@ import { Layout } from './components/Layout';
 import { PDFConverter } from './components/PDFConverter';
 import { TikTokDownloader } from './components/TikTokDownloader';
 import { Pricing } from './components/Pricing';
+import { Terms } from './components/Terms';
+import { Privacy } from './components/Privacy';
+import { PolicyBanner } from './components/PolicyBanner';
 import { ToolType, Language, Theme } from './types';
 
 const App: React.FC = () => {
@@ -37,22 +40,29 @@ const App: React.FC = () => {
         return <TikTokDownloader language={language} />;
       case ToolType.PRICING:
         return <Pricing language={language} />;
+      case ToolType.TERMS:
+        return <Terms language={language} />;
+      case ToolType.PRIVACY:
+        return <Privacy language={language} />;
       default:
         return <PDFConverter language={language} />;
     }
   };
 
   return (
-    <Layout 
-      activeTool={activeTool} 
-      onToolChange={setActiveTool} 
-      theme={theme} 
-      onToggleTheme={toggleTheme}
-      language={language}
-      onToggleLanguage={toggleLanguage}
-    >
-      {renderContent()}
-    </Layout>
+    <>
+      <Layout 
+        activeTool={activeTool} 
+        onToolChange={setActiveTool} 
+        theme={theme} 
+        onToggleTheme={toggleTheme}
+        language={language}
+        onToggleLanguage={toggleLanguage}
+      >
+        {renderContent()}
+      </Layout>
+      <PolicyBanner language={language} onNavigate={setActiveTool} />
+    </>
   );
 };
 
