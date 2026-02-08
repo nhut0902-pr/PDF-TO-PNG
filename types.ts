@@ -44,3 +44,6 @@ export enum ToolType {
   TIKTOK_DOWNLOADER = 'TIKTOK_DOWNLOADER',
   PRICING = 'PRICING'
 }
+
+export type Language = 'vi' | 'en';
+export type Theme = 'light' | 'dark';
