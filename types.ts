@@ -1,4 +1,3 @@
-
 export interface TikTokData {
   code: number;
   msg: string;
@@ -15,6 +14,17 @@ export interface TikTokData {
       avatar: string;
     };
   };
+}
+
+export interface HistoryItem {
+  id: string;
+  title: string;
+  cover: string;
+  authorNickname: string;
+  authorAvatar: string;
+  timestamp: number;
+  type: 'video' | 'slideshow';
+  originalUrl: string;
 }
 
 export enum ImageFormat {
