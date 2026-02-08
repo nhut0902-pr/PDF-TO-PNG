@@ -17,10 +17,16 @@ export interface TikTokData {
   };
 }
 
+export enum ImageFormat {
+  PNG = 'image/png',
+  JPG = 'image/jpeg'
+}
+
 export interface PDFPageImage {
   id: number;
   dataUrl: string;
   blob: Blob;
+  format: 'png' | 'jpg';
 }
 
 export enum ToolType {
