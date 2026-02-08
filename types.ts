@@ -41,5 +41,6 @@ export interface PDFPageImage {
 
 export enum ToolType {
   PDF_TO_IMAGE = 'PDF_TO_IMAGE',
-  TIKTOK_DOWNLOADER = 'TIKTOK_DOWNLOADER'
+  TIKTOK_DOWNLOADER = 'TIKTOK_DOWNLOADER',
+  PRICING = 'PRICING'
 }
