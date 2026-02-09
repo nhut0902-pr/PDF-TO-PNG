@@ -122,7 +122,7 @@ export const RewardCenter: React.FC<Props> = ({ language, usageCount, maxLimit, 
         <div className="space-y-6">
           <div className={`rounded-[2.5rem] p-8 shadow-xl border transition-all duration-500 ${
             isBonusActive 
-              ? 'bg-gradient-to-br from-amber-500 to-orange-600 border-transparent text-white' 
+              ? 'bg-gradient-to-br from-amber-500 to-orange-600 border-transparent text-white scale-[1.02] ring-4 ring-amber-500/20' 
               : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800'
           }`}>
             <h3 className={`text-xs font-black uppercase tracking-widest mb-6 ${isBonusActive ? 'text-amber-100' : 'text-slate-400 dark:text-slate-500'}`}>
@@ -136,7 +136,7 @@ export const RewardCenter: React.FC<Props> = ({ language, usageCount, maxLimit, 
                       <span className={`text-lg ml-2 ${isBonusActive ? 'text-amber-200' : 'text-slate-300 dark:text-slate-700'}`}>/ {maxLimit}</span>
                     </p>
                     {isBonusActive && (
-                      <span className="bg-white/20 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter animate-pulse">
+                      <span className="bg-white/20 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter animate-pulse border border-white/30">
                         PRO+
                       </span>
                     )}
@@ -154,7 +154,7 @@ export const RewardCenter: React.FC<Props> = ({ language, usageCount, maxLimit, 
                   </svg>
                </div>
             </div>
-            <div className={`w-full rounded-2xl p-4 flex items-center space-x-3 ${isBonusActive ? 'bg-white/10' : 'bg-slate-50 dark:bg-slate-800'}`}>
+            <div className={`w-full rounded-2xl p-4 flex items-center space-x-3 ${isBonusActive ? 'bg-white/10 border border-white/20' : 'bg-slate-50 dark:bg-slate-800'}`}>
                <div className={`p-2 rounded-lg ${isBonusActive ? 'bg-white/20 text-white' : 'bg-amber-100 dark:bg-amber-900/30 text-amber-600'}`}>
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" /></svg>
                </div>
@@ -185,18 +185,22 @@ export const RewardCenter: React.FC<Props> = ({ language, usageCount, maxLimit, 
         <div className="flex flex-col">
           <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 md:p-12 shadow-xl border border-slate-100 dark:border-slate-800 transition-all flex-grow">
             {isBonusActive ? (
-              <div className="h-full flex flex-col items-center justify-center text-center animate-fade-in">
-                <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center text-emerald-600 mb-6 shadow-inner">
-                  <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="h-full flex flex-col items-center justify-center text-center animate-fade-in py-10">
+                <div className="w-24 h-24 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center text-emerald-600 mb-8 shadow-inner ring-8 ring-emerald-50 dark:ring-emerald-900/10">
+                  <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase italic mb-4">{t.activeBadge}</h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed max-w-xs mb-8">
+                <div className="space-y-2 mb-8">
+                  <h3 className="text-3xl font-black text-slate-900 dark:text-white uppercase italic tracking-tighter">{t.activeBadge}</h3>
+                  <div className="inline-block px-4 py-1 bg-amber-100 text-amber-700 text-[10px] font-black rounded-full uppercase tracking-widest">Gói Bonus 50 Lượt</div>
+                </div>
+                <p className="text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed max-w-xs mb-10">
                   {t.activeDesc}
                 </p>
-                <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700 w-full">
-                   <p className="text-[10px] text-slate-400 uppercase font-black">{t.safeInfo}</p>
+                <div className="bg-slate-50 dark:bg-slate-800 p-6 rounded-3xl border border-dashed border-slate-200 dark:border-slate-700 w-full">
+                   <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest mb-1">{t.safeInfo}</p>
+                   <p className="text-[9px] text-slate-300 font-bold uppercase tracking-tight">Status: Active (LocalStorage Managed)</p>
                 </div>
               </div>
             ) : (

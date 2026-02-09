@@ -354,4 +354,40 @@ export const TikTokDownloader: React.FC<Props> = ({ language, usageCount, maxLim
                         className="group flex items-center p-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all cursor-pointer border border-transparent hover:border-slate-100 dark:hover:border-slate-800"
                       >
                         <div className="w-12 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-slate-200 dark:bg-slate-800 relative">
-                          <img src={item.cover} alt="" className="w-full h-full
+                          <img src={item.cover} alt="" className="w-full h-full object-cover" />
+                          {item.type === 'slideshow' && (
+                            <div className="absolute top-1 right-1 bg-black/60 backdrop-blur-sm rounded-md p-0.5">
+                              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                            </div>
+                          )}
+                        </div>
+                        <div className="ml-3 flex-grow min-w-0">
+                          <h4 className="text-xs font-black text-slate-900 dark:text-white truncate">@{item.authorNickname}</h4>
+                          <p className="text-[10px] text-slate-400 truncate font-medium">{item.title}</p>
+                          <p className="text-[9px] text-slate-300 dark:text-slate-600 font-bold uppercase mt-1">{formatTime(item.timestamp)}</p>
+                        </div>
+                        <button 
+                          onClick={(e) => removeFromHistory(item.id, e)}
+                          className="opacity-0 group-hover:opacity-100 p-2 text-slate-300 hover:text-rose-500 transition-all"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <LimitReachedModal 
+        isOpen={showLimitModal} 
+        onClose={() => setShowLimitModal(false)}
+        onUpgrade={() => { setShowLimitModal(false); onNavigate?.(ToolType.PRICING); }}
+        onRedeemSuccess={() => { setShowLimitModal(false); onRefreshLimits(); }}
+        language={language}
+      />
+    </>
+  );
+};
