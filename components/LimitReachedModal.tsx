@@ -10,17 +10,14 @@ interface Props {
   language: Language;
 }
 
-const VALID_CODES = [
-  'SUPERTOOL_01',
-  'NHUTCODER_02',
-  'REWARD_03',
-  'BONUS_04',
-  'GIFT_05',
-  'PRO_06',
-  'VIP_07',
-  'CODE_08',
-  'NHUT_09',
-  '090211'
+const PERMANENT_CODES = [
+  'SUPERTOOL_01', 'NHUTCODER_02', 'REWARD_03', 'BONUS_04', 'GIFT_05',
+  'PRO_06', 'VIP_07', 'CODE_08', 'NHUT_09', '090211'
+];
+
+const TRIAL_CODES = [
+  'TRIAL24_01', 'TRIAL24_02', 'TRIAL24_03', 'TRIAL24_04', 'TRIAL24_05',
+  'TRIAL24_06', 'TRIAL24_07', 'TRIAL24_08', 'TRIAL24_09', 'TRIAL24_10'
 ];
 
 export const LimitReachedModal: React.FC<Props> = ({ isOpen, onClose, onUpgrade, onRedeemSuccess, language }) => {
@@ -36,28 +33,28 @@ export const LimitReachedModal: React.FC<Props> = ({ isOpen, onClose, onUpgrade,
       message: 'Bạn đã đạt giới hạn 10 lượt xử lý file trong ngày. Nâng cấp PRO hoặc nhập mã quà tặng để tiếp tục.',
       upgrade: 'Nâng cấp ngay',
       cancel: 'Để sau',
-      giftLabel: 'Nhập mã quà tặng',
+      giftLabel: 'Nhập mã quà tặng / Dùng thử',
       giftPlaceholder: 'Nhập mã code...',
       submit: 'Áp dụng',
       contactHint: 'Muốn nhận mã vui lòng truy cập TikTok ib cho mình:',
       contactLink: 'nhutcoder0902',
       codeUsed: 'Bạn đã sử dụng mã này rồi!',
       codeInvalid: 'Mã không chính xác.',
-      codeSuccess: 'Áp dụng mã thành công! Giới hạn đã được tăng.'
+      codeSuccess: 'Áp dụng thành công! Giới hạn đã được tăng.'
     },
     en: {
       title: 'Daily Limit Reached',
       message: 'You reached the 10-file daily limit. Upgrade to PRO or enter a gift code to continue.',
       upgrade: 'Upgrade Now',
       cancel: 'Later',
-      giftLabel: 'Enter Gift Code',
+      giftLabel: 'Enter Gift / Trial Code',
       giftPlaceholder: 'Enter code...',
       submit: 'Apply',
       contactHint: 'To get a code, please contact me on TikTok:',
       contactLink: 'nhutcoder0902',
       codeUsed: 'You have already used this code!',
       codeInvalid: 'Invalid code.',
-      codeSuccess: 'Code applied successfully! Limit increased.'
+      codeSuccess: 'Success! Limit increased.'
     }
   }[language];
 
@@ -68,19 +65,28 @@ export const LimitReachedModal: React.FC<Props> = ({ isOpen, onClose, onUpgrade,
     const inputCode = code.trim().toUpperCase();
     if (!inputCode) return;
 
-    if (VALID_CODES.includes(inputCode)) {
-      const alreadyRedeemed = localStorage.getItem('supertool_promo_redeemed') === 'true';
-      if (alreadyRedeemed) {
+    if (PERMANENT_CODES.includes(inputCode)) {
+      if (localStorage.getItem('supertool_promo_redeemed') === 'true') {
         setError(t.codeUsed);
         return;
       }
-
       localStorage.setItem('supertool_promo_redeemed', 'true');
       setSuccessMsg(t.codeSuccess);
       setTimeout(() => {
         onRedeemSuccess();
         setCode('');
-        setSuccessMsg('');
+      }, 1500);
+    } else if (TRIAL_CODES.includes(inputCode)) {
+      const trialExpires = parseInt(localStorage.getItem('supertool_trial_expires') || '0', 10);
+      if (trialExpires > Date.now() || localStorage.getItem('supertool_promo_redeemed') === 'true') {
+        setError(t.codeUsed);
+        return;
+      }
+      localStorage.setItem('supertool_trial_expires', (Date.now() + 24 * 60 * 60 * 1000).toString());
+      setSuccessMsg(t.codeSuccess);
+      setTimeout(() => {
+        onRedeemSuccess();
+        setCode('');
       }, 1500);
     } else {
       setError(t.codeInvalid);
@@ -90,9 +96,9 @@ export const LimitReachedModal: React.FC<Props> = ({ isOpen, onClose, onUpgrade,
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onClick={onClose}></div>
-      <div className="relative bg-white dark:bg-slate-900 rounded-[2rem] p-6 md:p-8 max-w-md w-full shadow-2xl border border-slate-100 dark:border-slate-800 animate-slide-up overflow-hidden">
+      <div className="relative bg-white dark:bg-slate-900 rounded-[2rem] p-6 md:p-8 max-w-md w-full shadow-2xl border border-slate-100 dark:border-slate-800 animate-slide-up overflow-hidden text-center">
         
-        <div className="text-center mb-6">
+        <div className="mb-6">
             <div className="w-14 h-14 bg-rose-100 dark:bg-rose-900/30 rounded-full flex items-center justify-center mb-4 mx-auto">
             <svg className="w-7 h-7 text-rose-500 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />

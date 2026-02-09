@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Language } from '../types';
 
 interface Props {
@@ -9,26 +9,49 @@ interface Props {
   onRefreshLimits: () => void;
 }
 
-const VALID_CODES = [
-  'SUPERTOOL_01',
-  'NHUTCODER_02',
-  'REWARD_03',
-  'BONUS_04',
-  'GIFT_05',
-  'PRO_06',
-  'VIP_07',
-  'CODE_08',
-  'NHUT_09',
-  '090211'
+const PERMANENT_CODES = [
+  'SUPERTOOL_01', 'NHUTCODER_02', 'REWARD_03', 'BONUS_04', 'GIFT_05',
+  'PRO_06', 'VIP_07', 'CODE_08', 'NHUT_09', '090211'
+];
+
+const TRIAL_CODES = [
+  'TRIAL24_01', 'TRIAL24_02', 'TRIAL24_03', 'TRIAL24_04', 'TRIAL24_05',
+  'TRIAL24_06', 'TRIAL24_07', 'TRIAL24_08', 'TRIAL24_09', 'TRIAL24_10'
 ];
 
 export const RewardCenter: React.FC<Props> = ({ language, usageCount, maxLimit, onRefreshLimits }) => {
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [timeLeft, setTimeLeft] = useState<string | null>(null);
 
   const BONUS_LIMIT = 50;
   const isBonusActive = maxLimit === BONUS_LIMIT;
+
+  useEffect(() => {
+    const updateCountdown = () => {
+      const expires = parseInt(localStorage.getItem('supertool_trial_expires') || '0', 10);
+      const isPermanent = localStorage.getItem('supertool_promo_redeemed') === 'true';
+      
+      if (isPermanent) {
+        setTimeLeft(null);
+        return;
+      }
+
+      const diff = expires - Date.now();
+      if (diff > 0) {
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        setTimeLeft(`${hours}h ${mins}p`);
+      } else {
+        setTimeLeft(null);
+      }
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 60000);
+    return () => clearInterval(interval);
+  }, [maxLimit]);
 
   const t = {
     vi: {
@@ -37,21 +60,23 @@ export const RewardCenter: React.FC<Props> = ({ language, usageCount, maxLimit, 
       usageStatus: 'TRẠNG THÁI HIỆN TẠI',
       used: 'Đã dùng',
       limit: 'Giới hạn',
-      inputLabel: 'KÍCH HOẠT MÃ QUÀ TẶNG',
+      inputLabel: 'KÍCH HOẠT MÃ QUÀ TẶNG / DÙNG THỬ',
       placeholder: 'Nhập mã của bạn...',
       btnSubmit: 'XÁC NHẬN KÍCH HOẠT',
       errorInvalid: 'Mã không chính xác hoặc đã hết hạn.',
-      errorUsed: 'Bạn đã kích hoạt gói Bonus rồi!',
+      errorUsed: 'Bạn đã kích hoạt gói này rồi!',
       successMsg: 'Kích hoạt thành công! Giới hạn đã tăng lên 50 lượt.',
+      trialSuccessMsg: 'Kích hoạt dùng thử 24h thành công! Giới hạn tăng lên 50 lượt.',
       guideTitle: 'LÀM SAO ĐỂ CÓ MÃ?',
       guideStep1: '1. Theo dõi TikTok của mình tại @nhutcoder0902',
       guideStep2: '2. Nhắn tin hoặc xem các video mới nhất để nhận code.',
       guideStep3: '3. Mã code thường được làm mới mỗi tuần.',
       btnTikTok: 'TRUY CẬP TIKTOK',
       statusFree: 'Gói FREE (10 lượt)',
-      statusBonus: 'Gói BONUS (50 lượt)',
+      statusBonus: 'Gói PRO (50 lượt)',
       activeBadge: 'ĐÃ KÍCH HOẠT',
-      activeDesc: 'Chúc mừng! Bạn đang sử dụng giới hạn 50 lượt/ngày. Mã quà tặng tiếp theo sẽ khả dụng khi gói này hết hạn.',
+      activeDesc: 'Chúc mừng! Bạn đang sử dụng giới hạn 50 lượt/ngày.',
+      trialTime: 'Thời hạn dùng thử còn: ',
       safeInfo: 'Hệ thống tự động ghi nhớ trạng thái trên trình duyệt này.'
     },
     en: {
@@ -60,21 +85,23 @@ export const RewardCenter: React.FC<Props> = ({ language, usageCount, maxLimit, 
       usageStatus: 'CURRENT STATUS',
       used: 'Used',
       limit: 'Limit',
-      inputLabel: 'ACTIVATE GIFT CODE',
+      inputLabel: 'ACTIVATE GIFT / TRIAL CODE',
       placeholder: 'Enter your code...',
       btnSubmit: 'CONFIRM ACTIVATION',
       errorInvalid: 'Invalid or expired code.',
-      errorUsed: 'Bonus plan already active!',
+      errorUsed: 'Plan already active!',
       successMsg: 'Success! Your limit increased to 50 uses.',
+      trialSuccessMsg: '24h Trial activated! Limit increased to 50 uses.',
       guideTitle: 'HOW TO GET CODES?',
       guideStep1: '1. Follow my TikTok @nhutcoder0902',
       guideStep2: '2. Message me or check latest videos for codes.',
       guideStep3: '3. Codes are usually refreshed weekly.',
       btnTikTok: 'VISIT TIKTOK',
       statusFree: 'FREE Plan (10 uses)',
-      statusBonus: 'BONUS Plan (50 uses)',
+      statusBonus: 'PRO Plan (50 uses)',
       activeBadge: 'ACTIVATED',
-      activeDesc: 'Congrats! You are using 50 uses/day limit. Next codes will be available after this one expires.',
+      activeDesc: 'Congrats! You are using 50 uses/day limit.',
+      trialTime: 'Trial expires in: ',
       safeInfo: 'System automatically remembers status on this browser.'
     }
   }[language];
@@ -86,15 +113,23 @@ export const RewardCenter: React.FC<Props> = ({ language, usageCount, maxLimit, 
     const inputCode = code.trim().toUpperCase();
     if (!inputCode) return;
 
-    if (VALID_CODES.includes(inputCode)) {
-      const alreadyRedeemed = localStorage.getItem('supertool_promo_redeemed') === 'true';
-      if (alreadyRedeemed) {
+    if (PERMANENT_CODES.includes(inputCode)) {
+      if (localStorage.getItem('supertool_promo_redeemed') === 'true') {
         setError(t.errorUsed);
         return;
       }
-
       localStorage.setItem('supertool_promo_redeemed', 'true');
       setSuccess(t.successMsg);
+      setCode('');
+      onRefreshLimits();
+    } else if (TRIAL_CODES.includes(inputCode)) {
+      const trialExpires = parseInt(localStorage.getItem('supertool_trial_expires') || '0', 10);
+      if (trialExpires > Date.now() || localStorage.getItem('supertool_promo_redeemed') === 'true') {
+        setError(t.errorUsed);
+        return;
+      }
+      localStorage.setItem('supertool_trial_expires', (Date.now() + 24 * 60 * 60 * 1000).toString());
+      setSuccess(t.trialSuccessMsg);
       setCode('');
       onRefreshLimits();
     } else {
@@ -137,7 +172,7 @@ export const RewardCenter: React.FC<Props> = ({ language, usageCount, maxLimit, 
                     </p>
                     {isBonusActive && (
                       <span className="bg-white/20 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter animate-pulse border border-white/30">
-                        PRO+
+                        {timeLeft ? 'TRIAL' : 'PRO+'}
                       </span>
                     )}
                   </div>
@@ -154,6 +189,11 @@ export const RewardCenter: React.FC<Props> = ({ language, usageCount, maxLimit, 
                   </svg>
                </div>
             </div>
+            {timeLeft && (
+              <div className="mb-4 text-xs font-black uppercase tracking-widest text-amber-100 animate-pulse">
+                {t.trialTime}{timeLeft}
+              </div>
+            )}
             <div className={`w-full rounded-2xl p-4 flex items-center space-x-3 ${isBonusActive ? 'bg-white/10 border border-white/20' : 'bg-slate-50 dark:bg-slate-800'}`}>
                <div className={`p-2 rounded-lg ${isBonusActive ? 'bg-white/20 text-white' : 'bg-amber-100 dark:bg-amber-900/30 text-amber-600'}`}>
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" /></svg>
@@ -184,7 +224,7 @@ export const RewardCenter: React.FC<Props> = ({ language, usageCount, maxLimit, 
 
         <div className="flex flex-col">
           <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 md:p-12 shadow-xl border border-slate-100 dark:border-slate-800 transition-all flex-grow">
-            {isBonusActive ? (
+            {isBonusActive && !timeLeft ? (
               <div className="h-full flex flex-col items-center justify-center text-center animate-fade-in py-10">
                 <div className="w-24 h-24 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center text-emerald-600 mb-8 shadow-inner ring-8 ring-emerald-50 dark:ring-emerald-900/10">
                   <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -193,7 +233,7 @@ export const RewardCenter: React.FC<Props> = ({ language, usageCount, maxLimit, 
                 </div>
                 <div className="space-y-2 mb-8">
                   <h3 className="text-3xl font-black text-slate-900 dark:text-white uppercase italic tracking-tighter">{t.activeBadge}</h3>
-                  <div className="inline-block px-4 py-1 bg-amber-100 text-amber-700 text-[10px] font-black rounded-full uppercase tracking-widest">Gói Bonus 50 Lượt</div>
+                  <div className="inline-block px-4 py-1 bg-amber-100 text-amber-700 text-[10px] font-black rounded-full uppercase tracking-widest">Gói PRO Vĩnh Viễn</div>
                 </div>
                 <p className="text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed max-w-xs mb-10">
                   {t.activeDesc}
@@ -233,6 +273,13 @@ export const RewardCenter: React.FC<Props> = ({ language, usageCount, maxLimit, 
                     </div>
                   )}
                 </div>
+
+                {timeLeft && (
+                  <div className="mt-8 p-6 bg-amber-50 dark:bg-amber-900/20 rounded-2xl border border-amber-100 dark:border-amber-900/30 text-center">
+                    <p className="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-[0.2em] mb-2">Đang sử dụng gói dùng thử 24h</p>
+                    <p className="text-2xl font-black text-amber-600 dark:text-amber-400 italic">{timeLeft}</p>
+                  </div>
+                )}
               </div>
             )}
           </div>

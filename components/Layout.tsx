@@ -78,7 +78,7 @@ export const Layout: React.FC<LayoutProps> = ({
               <nav className="flex items-center bg-gray-100 dark:bg-slate-800 p-1 rounded-xl w-full lg:w-auto overflow-x-auto no-scrollbar">
                 <button
                   onClick={() => onToolChange(ToolType.PDF_TO_IMAGE)}
-                  className={`whitespace-nowrap flex-1 lg:flex-none px-4 py-2 rounded-lg text-xs font-black transition-all ${
+                  className={`whitespace-nowrap flex-1 lg:flex-none px-6 py-2 rounded-lg text-xs font-black transition-all ${
                     activeTool === ToolType.PDF_TO_IMAGE
                       ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
                       : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
@@ -88,7 +88,7 @@ export const Layout: React.FC<LayoutProps> = ({
                 </button>
                 <button
                   onClick={() => onToolChange(ToolType.TIKTOK_DOWNLOADER)}
-                  className={`whitespace-nowrap flex-1 lg:flex-none px-4 py-2 rounded-lg text-xs font-black transition-all ${
+                  className={`whitespace-nowrap flex-1 lg:flex-none px-6 py-2 rounded-lg text-xs font-black transition-all ${
                     activeTool === ToolType.TIKTOK_DOWNLOADER
                       ? 'bg-white dark:bg-slate-700 text-pink-600 dark:text-pink-400 shadow-sm'
                       : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
@@ -98,7 +98,7 @@ export const Layout: React.FC<LayoutProps> = ({
                 </button>
                 <button
                   onClick={() => onToolChange(ToolType.REWARD_CENTER)}
-                  className={`whitespace-nowrap flex-1 lg:flex-none px-4 py-2 rounded-lg text-xs font-black transition-all ${
+                  className={`whitespace-nowrap flex-1 lg:flex-none px-6 py-2 rounded-lg text-xs font-black transition-all ${
                     activeTool === ToolType.REWARD_CENTER
                       ? 'bg-white dark:bg-slate-700 text-amber-500 dark:text-amber-400 shadow-sm'
                       : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
@@ -108,7 +108,7 @@ export const Layout: React.FC<LayoutProps> = ({
                 </button>
                 <button
                   onClick={() => onToolChange(ToolType.PRICING)}
-                  className={`whitespace-nowrap flex-1 lg:flex-none px-4 py-2 rounded-lg text-xs font-black transition-all ${
+                  className={`whitespace-nowrap flex-1 lg:flex-none px-6 py-2 rounded-lg text-xs font-black transition-all ${
                     activeTool === ToolType.PRICING
                       ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm'
                       : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'

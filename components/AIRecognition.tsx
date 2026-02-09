@@ -7,19 +7,18 @@ import { LimitReachedModal } from './LimitReachedModal';
 interface Props {
   language: Language;
   onNavigate?: (tool: ToolType) => void;
+  usageCount: number;
+  maxLimit: number;
+  onRefreshLimits: () => void;
 }
 
 const getUsageKey = () => `supertool_usage_${new Date().toLocaleDateString('en-CA')}`;
-const DEFAULT_LIMIT = 10;
-const BONUS_LIMIT = 50;
 
-export const AIRecognition: React.FC<Props> = ({ language, onNavigate }) => {
+export const AIRecognition: React.FC<Props> = ({ language, onNavigate, usageCount, maxLimit, onRefreshLimits }) => {
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string>('');
   const [isDragging, setIsDragging] = useState(false);
-  const [usageCount, setUsageCount] = useState(0);
-  const [maxLimit, setMaxLimit] = useState(DEFAULT_LIMIT);
   const [showLimitModal, setShowLimitModal] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -59,22 +58,11 @@ export const AIRecognition: React.FC<Props> = ({ language, onNavigate }) => {
     }
   }[language];
 
-  useEffect(() => {
-    refreshLimitStatus();
-  }, []);
-
-  const refreshLimitStatus = () => {
-    const current = parseInt(localStorage.getItem(getUsageKey()) || '0', 10);
-    setUsageCount(current);
-    const isRedeemed = localStorage.getItem('supertool_promo_redeemed');
-    setMaxLimit(isRedeemed ? BONUS_LIMIT : DEFAULT_LIMIT);
-  };
-
   const incrementLimit = () => {
     const current = parseInt(localStorage.getItem(getUsageKey()) || '0', 10);
     const newVal = current + 1;
     localStorage.setItem(getUsageKey(), newVal.toString());
-    setUsageCount(newVal);
+    onRefreshLimits();
   };
 
   const handleFile = (file: File) => {
@@ -101,7 +89,6 @@ export const AIRecognition: React.FC<Props> = ({ language, onNavigate }) => {
   const analyzeImage = async () => {
     if (!image) return;
 
-    // Check limit
     if (usageCount >= maxLimit) {
       setShowLimitModal(true);
       return;
@@ -262,7 +249,7 @@ export const AIRecognition: React.FC<Props> = ({ language, onNavigate }) => {
         isOpen={showLimitModal} 
         onClose={() => setShowLimitModal(false)}
         onUpgrade={() => { setShowLimitModal(false); onNavigate?.(ToolType.PRICING); }}
-        onRedeemSuccess={() => { setShowLimitModal(false); refreshLimitStatus(); }}
+        onRedeemSuccess={() => { setShowLimitModal(false); onRefreshLimits(); }}
         language={language}
       />
     </>

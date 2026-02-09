@@ -34,6 +34,8 @@ export const PDFConverter: React.FC<Props> = ({ language, usageCount, maxLimit, 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const stopRef = useRef(false);
 
+  const isPro = maxLimit > 10;
+
   useEffect(() => {
     const PDFJS_VERSION = '4.4.168';
     pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDFJS_VERSION}/pdf.worker.min.mjs`;
@@ -43,12 +45,12 @@ export const PDFConverter: React.FC<Props> = ({ language, usageCount, maxLimit, 
     vi: {
       title: 'PDF TO IMAGE',
       subtitle: 'Chuyển đổi tài liệu PDF của bạn thành hình ảnh chất lượng cao ngay trên trình duyệt. Bảo mật 100%.',
-      config: 'Cấu hình xuất (Gói FREE)',
+      config: isPro ? 'Cấu hình xuất (Gói PRO)' : 'Cấu hình xuất (Gói FREE)',
       formatLabel: 'ĐỊNH DẠNG ẢNH',
       qualityLabel: 'CHẤT LƯỢNG (DPI)',
       quality1: '⚡ Tốc độ nhanh nhất (Mặc định)',
-      quality2: '✨ Độ phân giải tiêu chuẩn (Chỉ PRO)',
-      quality3: '💎 Siêu nét (Chỉ PRO)',
+      quality2: '✨ Độ phân giải tiêu chuẩn',
+      quality3: '💎 Siêu nét (Khuyên dùng cho in ấn)',
       originalFile: 'Tệp gốc',
       totalPages: 'Tổng số trang',
       estimatedSize: 'Ước lượng ảnh',
@@ -63,18 +65,18 @@ export const PDFConverter: React.FC<Props> = ({ language, usageCount, maxLimit, 
       page: 'TRANG',
       errorFile: 'Vui lòng chọn tệp PDF hợp lệ.',
       errorRead: 'Lỗi khi đọc file PDF. Có thể file bị khóa hoặc hỏng.',
-      proFeature: 'Tính năng này chỉ dành cho gói PRO. Vui lòng nâng cấp để sử dụng chất lượng cao.',
+      proFeature: 'Tính năng này chỉ dành cho gói PRO. Vui lòng nâng cấp hoặc nhập code để sử dụng chất lượng cao.',
       usageCount: 'Hôm nay bạn đã xử lý: {n}/{max}'
     },
     en: {
       title: 'PDF TO IMAGE',
       subtitle: 'Convert your PDF documents into high-quality images directly in your browser. 100% secure.',
-      config: 'Export Config (FREE Plan)',
+      config: isPro ? 'Export Config (PRO Plan)' : 'Export Config (FREE Plan)',
       formatLabel: 'IMAGE FORMAT',
       qualityLabel: 'QUALITY (DPI)',
       quality1: '⚡ Fastest speed (Default)',
-      quality2: '✨ Standard resolution (PRO Only)',
-      quality3: '💎 Ultra sharp (PRO Only)',
+      quality2: '✨ Standard resolution',
+      quality3: '💎 Ultra sharp (Best for printing)',
       originalFile: 'Original file',
       totalPages: 'Total pages',
       estimatedSize: 'Estimated size',
@@ -89,7 +91,7 @@ export const PDFConverter: React.FC<Props> = ({ language, usageCount, maxLimit, 
       page: 'PAGE',
       errorFile: 'Please select a valid PDF file.',
       errorRead: 'Error reading PDF file. It might be locked or corrupted.',
-      proFeature: 'This feature is for PRO plan only. Please upgrade to use high quality.',
+      proFeature: 'This feature is for PRO plan only. Please upgrade or enter code to use high quality.',
       usageCount: 'Usage today: {n}/{max}'
     }
   }[language];
@@ -115,7 +117,7 @@ export const PDFConverter: React.FC<Props> = ({ language, usageCount, maxLimit, 
     const current = parseInt(localStorage.getItem(getUsageKey()) || '0', 10);
     const newVal = current + 1;
     localStorage.setItem(getUsageKey(), newVal.toString());
-    onRefreshLimits(); // Sync global state
+    onRefreshLimits(); 
   };
 
   const handleFile = async (file: File) => {
@@ -213,7 +215,7 @@ export const PDFConverter: React.FC<Props> = ({ language, usageCount, maxLimit, 
   };
 
   const handleScaleChange = (s: number) => {
-    if (s > 1.0) {
+    if (s > 1.0 && !isPro) {
       alert(t.proFeature);
       return;
     }
@@ -271,13 +273,13 @@ export const PDFConverter: React.FC<Props> = ({ language, usageCount, maxLimit, 
                         className={`flex-1 py-3 rounded-xl text-xs font-black transition-all flex items-center justify-center space-x-1 ${
                           scale === s 
                             ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' 
-                            : s > 1.0 
+                            : s > 1.0 && !isPro 
                               ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed' 
                               : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'
                         }`}
                       >
                         <span>{s}x</span>
-                        {s > 1.0 && <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>}
+                        {s > 1.0 && !isPro && <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>}
                       </button>
                     ))}
                   </div>

@@ -30,15 +30,28 @@ const App: React.FC = () => {
   const [maxLimit, setMaxLimit] = useState(DEFAULT_LIMIT);
 
   const refreshLimits = useCallback(() => {
-    const current = parseInt(localStorage.getItem(getUsageKey()) || '0', 10);
+    const currentUsage = parseInt(localStorage.getItem(getUsageKey()) || '0', 10);
+    setUsageCount(currentUsage);
+
+    // Check permanent activation
     const isRedeemed = localStorage.getItem('supertool_promo_redeemed') === 'true';
-    setUsageCount(current);
-    setMaxLimit(isRedeemed ? BONUS_LIMIT : DEFAULT_LIMIT);
+    
+    // Check 24h trial activation
+    const trialExpires = parseInt(localStorage.getItem('supertool_trial_expires') || '0', 10);
+    const isTrialActive = trialExpires > Date.now();
+
+    if (isRedeemed || isTrialActive) {
+      setMaxLimit(BONUS_LIMIT);
+    } else {
+      setMaxLimit(DEFAULT_LIMIT);
+    }
   }, []);
 
   useEffect(() => {
     refreshLimits();
-  }, [refreshLimits, activeTool]);
+    const interval = setInterval(refreshLimits, 60000);
+    return () => clearInterval(interval);
+  }, [refreshLimits]);
 
   useEffect(() => {
     const root = window.document.documentElement;
