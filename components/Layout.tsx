@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { ToolType, Language, Theme } from '../types';
 
@@ -22,16 +23,18 @@ export const Layout: React.FC<LayoutProps> = ({
 }) => {
   const t = {
     vi: {
-      pdf: 'PDF SANG ẢNH',
-      tiktok: 'TIKTOK DL',
+      pdf: 'PDF',
+      tiktok: 'TIKTOK',
+      reward: 'NHẬN THƯỞNG',
       pricing: 'BẢNG GIÁ',
       terms: 'Điều khoản',
       privacy: 'Bảo mật',
       contact: 'Liên hệ',
     },
     en: {
-      pdf: 'PDF TO IMAGE',
-      tiktok: 'TIKTOK DL',
+      pdf: 'PDF',
+      tiktok: 'TIKTOK',
+      reward: 'REWARDS',
       pricing: 'PRICING',
       terms: 'Terms',
       privacy: 'Privacy',
@@ -75,7 +78,7 @@ export const Layout: React.FC<LayoutProps> = ({
               <nav className="flex items-center bg-gray-100 dark:bg-slate-800 p-1 rounded-xl w-full lg:w-auto overflow-x-auto no-scrollbar">
                 <button
                   onClick={() => onToolChange(ToolType.PDF_TO_IMAGE)}
-                  className={`whitespace-nowrap flex-1 lg:flex-none px-6 py-2 rounded-lg text-xs md:text-sm font-black transition-all ${
+                  className={`whitespace-nowrap flex-1 lg:flex-none px-4 py-2 rounded-lg text-xs font-black transition-all ${
                     activeTool === ToolType.PDF_TO_IMAGE
                       ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
                       : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
@@ -85,7 +88,7 @@ export const Layout: React.FC<LayoutProps> = ({
                 </button>
                 <button
                   onClick={() => onToolChange(ToolType.TIKTOK_DOWNLOADER)}
-                  className={`whitespace-nowrap flex-1 lg:flex-none px-6 py-2 rounded-lg text-xs md:text-sm font-black transition-all ${
+                  className={`whitespace-nowrap flex-1 lg:flex-none px-4 py-2 rounded-lg text-xs font-black transition-all ${
                     activeTool === ToolType.TIKTOK_DOWNLOADER
                       ? 'bg-white dark:bg-slate-700 text-pink-600 dark:text-pink-400 shadow-sm'
                       : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
@@ -94,8 +97,18 @@ export const Layout: React.FC<LayoutProps> = ({
                   {t.tiktok}
                 </button>
                 <button
+                  onClick={() => onToolChange(ToolType.REWARD_CENTER)}
+                  className={`whitespace-nowrap flex-1 lg:flex-none px-4 py-2 rounded-lg text-xs font-black transition-all ${
+                    activeTool === ToolType.REWARD_CENTER
+                      ? 'bg-white dark:bg-slate-700 text-amber-500 dark:text-amber-400 shadow-sm'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                  }`}
+                >
+                  {t.reward}
+                </button>
+                <button
                   onClick={() => onToolChange(ToolType.PRICING)}
-                  className={`whitespace-nowrap flex-1 lg:flex-none px-6 py-2 rounded-lg text-xs md:text-sm font-black transition-all ${
+                  className={`whitespace-nowrap flex-1 lg:flex-none px-4 py-2 rounded-lg text-xs font-black transition-all ${
                     activeTool === ToolType.PRICING
                       ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm'
                       : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
@@ -133,46 +146,13 @@ export const Layout: React.FC<LayoutProps> = ({
             <button onClick={() => onToolChange(ToolType.PRIVACY)} className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors uppercase">{t.privacy}</button>
             <a href="mailto:lamminhnhut09022011@gmail.com" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">{t.contact}</a>
           </div>
-          
           <div className="flex flex-col items-center space-y-3">
-            <div className="flex items-center space-x-4">
-              <a 
-                href="https://github.com/nhut0902-pr" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-slate-900 dark:hover:text-white transition-all transform hover:scale-110"
-                title="GitHub"
-              >
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
-                </svg>
-              </a>
-              <a 
-                href="https://www.tiktok.com/@nhutcoder0902?_r=1&_t=ZS-93kUoLjB3qB" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-pink-600 transition-all transform hover:scale-110"
-                title="TikTok"
-              >
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 448 512">
-                  <path d="M448 209.91a210.06 210.06 0 0 1-122.77-39.25V349.38A162.55 162.55 0 1 1 185 188.31V278.2a74.62 74.62 0 1 0 52.23 71.18V0l88 0a121.18 121.18 0 0 0 1.86 22.17h0A122.18 122.18 0 0 0 381 102.39a121.43 121.43 0 0 0 67 20.14z"/>
-                </svg>
-              </a>
-            </div>
             <p className="text-xs font-black text-slate-900 dark:text-slate-100 tracking-wider uppercase">
               Powered By <span className="text-blue-600">Nhutcoder</span>
             </p>
           </div>
-
-          <p className="text-xs font-bold text-gray-300 dark:text-gray-600 uppercase tracking-widest">
-            &copy; {new Date().getFullYear()} SuperTool Utilities.
-          </p>
         </div>
       </footer>
-      <style>{`
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-      `}</style>
     </div>
   );
 };

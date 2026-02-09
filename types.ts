@@ -1,3 +1,4 @@
+
 export interface TikTokData {
   code: number;
   msg: string;
@@ -5,9 +6,9 @@ export interface TikTokData {
     id: string;
     title: string;
     cover: string;
-    play: string; // Video no watermark
-    wmplay: string; // Video with watermark
-    images?: string[]; // If it's a slideshow
+    play: string;
+    wmplay: string;
+    images?: string[];
     music: string;
     author: {
       nickname: string;
@@ -42,6 +43,7 @@ export interface PDFPageImage {
 export enum ToolType {
   PDF_TO_IMAGE = 'PDF_TO_IMAGE',
   TIKTOK_DOWNLOADER = 'TIKTOK_DOWNLOADER',
+  REWARD_CENTER = 'REWARD_CENTER',
   PRICING = 'PRICING',
   TERMS = 'TERMS',
   PRIVACY = 'PRIVACY'

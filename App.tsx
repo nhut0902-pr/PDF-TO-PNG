@@ -1,12 +1,18 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useCallback } from 'react';
 import { Layout } from './components/Layout';
 import { PDFConverter } from './components/PDFConverter';
 import { TikTokDownloader } from './components/TikTokDownloader';
+import { RewardCenter } from './components/RewardCenter';
 import { Pricing } from './components/Pricing';
 import { Terms } from './components/Terms';
 import { Privacy } from './components/Privacy';
 import { PolicyBanner } from './components/PolicyBanner';
 import { ToolType, Language, Theme } from './types';
+
+const getUsageKey = () => `supertool_usage_${new Date().toLocaleDateString('en-CA')}`;
+const DEFAULT_LIMIT = 10;
+const BONUS_LIMIT = 50;
 
 const App: React.FC = () => {
   const [activeTool, setActiveTool] = useState<ToolType>(ToolType.PDF_TO_IMAGE);
@@ -18,6 +24,21 @@ const App: React.FC = () => {
     }
     return 'light';
   });
+
+  // Global usage state
+  const [usageCount, setUsageCount] = useState(0);
+  const [maxLimit, setMaxLimit] = useState(DEFAULT_LIMIT);
+
+  const refreshLimits = useCallback(() => {
+    const current = parseInt(localStorage.getItem(getUsageKey()) || '0', 10);
+    const isRedeemed = localStorage.getItem('supertool_promo_redeemed') === 'true';
+    setUsageCount(current);
+    setMaxLimit(isRedeemed ? BONUS_LIMIT : DEFAULT_LIMIT);
+  }, []);
+
+  useEffect(() => {
+    refreshLimits();
+  }, [refreshLimits, activeTool]);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -33,11 +54,20 @@ const App: React.FC = () => {
   const toggleLanguage = () => setLanguage(prev => prev === 'vi' ? 'en' : 'vi');
 
   const renderContent = () => {
+    const commonProps = {
+      language,
+      usageCount,
+      maxLimit,
+      onRefreshLimits: refreshLimits
+    };
+
     switch (activeTool) {
       case ToolType.PDF_TO_IMAGE:
-        return <PDFConverter language={language} />;
+        return <PDFConverter {...commonProps} onNavigate={setActiveTool} />;
       case ToolType.TIKTOK_DOWNLOADER:
-        return <TikTokDownloader language={language} />;
+        return <TikTokDownloader {...commonProps} onNavigate={setActiveTool} />;
+      case ToolType.REWARD_CENTER:
+        return <RewardCenter {...commonProps} />;
       case ToolType.PRICING:
         return <Pricing language={language} />;
       case ToolType.TERMS:
@@ -45,7 +75,7 @@ const App: React.FC = () => {
       case ToolType.PRIVACY:
         return <Privacy language={language} />;
       default:
-        return <PDFConverter language={language} />;
+        return <PDFConverter {...commonProps} onNavigate={setActiveTool} />;
     }
   };
 

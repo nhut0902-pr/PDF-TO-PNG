@@ -1,5 +1,5 @@
 {
-  "name": "SuperTool - PDF & TikTok Utility",
-  "description": "A high-performance utility tool to convert PDF to images and download TikTok videos or images without watermarks.",
+  "name": "SuperTool - PDF & TikTok Downloader",
+  "description": "A high-performance utility tool to convert PDF to images and download TikTok content without watermark.",
   "requestFramePermissions": []
 }
