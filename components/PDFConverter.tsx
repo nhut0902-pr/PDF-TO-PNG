@@ -12,13 +12,16 @@ interface Props {
   language: Language;
 }
 
+const getUsageKey = () => `supertool_usage_${new Date().toLocaleDateString('en-CA')}`;
+const MAX_DAILY_USAGE = 10;
+
 export const PDFConverter: React.FC<Props> = ({ language }) => {
   const [images, setImages] = useState<PDFPageImage[]>([]);
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentTask, setCurrentTask] = useState('');
   const [selectedFormat, setSelectedFormat] = useState<ImageFormat>(ImageFormat.PNG);
-  const [scale, setScale] = useState(2.0); 
+  const [scale, setScale] = useState(1.0); // Default to 1.0 for Free plan
   const [fileInfo, setFileInfo] = useState<PDFMetadata | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   
@@ -29,12 +32,12 @@ export const PDFConverter: React.FC<Props> = ({ language }) => {
     vi: {
       title: 'PDF TO IMAGE',
       subtitle: 'Chuyển đổi tài liệu PDF của bạn thành hình ảnh chất lượng cao ngay trên trình duyệt. Bảo mật 100%.',
-      config: 'Cấu hình xuất',
+      config: 'Cấu hình xuất (Gói FREE)',
       formatLabel: 'ĐỊNH DẠNG ẢNH',
       qualityLabel: 'CHẤT LƯỢNG (DPI)',
-      quality1: '⚡ Tốc độ nhanh nhất',
-      quality2: '✨ Độ phân giải tiêu chuẩn',
-      quality3: '💎 Siêu nét (Dành cho in ấn)',
+      quality1: '⚡ Tốc độ nhanh nhất (Mặc định)',
+      quality2: '✨ Độ phân giải tiêu chuẩn (Chỉ PRO)',
+      quality3: '💎 Siêu nét (Chỉ PRO)',
       originalFile: 'Tệp gốc',
       totalPages: 'Tổng số trang',
       estimatedSize: 'Ước lượng ảnh',
@@ -48,17 +51,20 @@ export const PDFConverter: React.FC<Props> = ({ language }) => {
       ready: 'đã hoàn thành',
       page: 'TRANG',
       errorFile: 'Vui lòng chọn tệp PDF hợp lệ.',
-      errorRead: 'Lỗi khi đọc file PDF. Có thể file bị khóa hoặc hỏng.'
+      errorRead: 'Lỗi khi đọc file PDF. Có thể file bị khóa hoặc hỏng.',
+      limitReached: 'Bạn đã đạt giới hạn 10 file/ngày của gói FREE. Vui lòng quay lại vào ngày mai hoặc nâng cấp PRO.',
+      proFeature: 'Tính năng này chỉ dành cho gói PRO. Vui lòng nâng cấp để sử dụng chất lượng cao.',
+      usageCount: 'Hôm nay bạn đã xử lý: {n}/{max}'
     },
     en: {
       title: 'PDF TO IMAGE',
       subtitle: 'Convert your PDF documents into high-quality images directly in your browser. 100% secure.',
-      config: 'Export Config',
+      config: 'Export Config (FREE Plan)',
       formatLabel: 'IMAGE FORMAT',
       qualityLabel: 'QUALITY (DPI)',
-      quality1: '⚡ Fastest speed',
-      quality2: '✨ Standard resolution',
-      quality3: '💎 Ultra sharp (For printing)',
+      quality1: '⚡ Fastest speed (Default)',
+      quality2: '✨ Standard resolution (PRO Only)',
+      quality3: '💎 Ultra sharp (PRO Only)',
       originalFile: 'Original file',
       totalPages: 'Total pages',
       estimatedSize: 'Estimated size',
@@ -72,7 +78,10 @@ export const PDFConverter: React.FC<Props> = ({ language }) => {
       ready: 'completed',
       page: 'PAGE',
       errorFile: 'Please select a valid PDF file.',
-      errorRead: 'Error reading PDF file. It might be locked or corrupted.'
+      errorRead: 'Error reading PDF file. It might be locked or corrupted.',
+      limitReached: 'You have reached the daily limit of 10 files (FREE plan). Please come back tomorrow or upgrade to PRO.',
+      proFeature: 'This feature is for PRO plan only. Please upgrade to use high quality.',
+      usageCount: 'Usage today: {n}/{max}'
     }
   }[language];
 
@@ -98,7 +107,24 @@ export const PDFConverter: React.FC<Props> = ({ language }) => {
     return estimated.toFixed(1) + ' MB';
   };
 
+  const checkLimit = () => {
+    const usage = parseInt(localStorage.getItem(getUsageKey()) || '0', 10);
+    return usage;
+  };
+
+  const incrementLimit = () => {
+    const current = checkLimit();
+    localStorage.setItem(getUsageKey(), (current + 1).toString());
+  };
+
   const handleFile = async (file: File) => {
+    // Check daily limit strictly
+    const currentUsage = checkLimit();
+    if (currentUsage >= MAX_DAILY_USAGE) {
+      alert(t.limitReached);
+      return;
+    }
+
     if (file.type !== 'application/pdf') {
       alert(t.errorFile);
       return;
@@ -157,6 +183,7 @@ export const PDFConverter: React.FC<Props> = ({ language }) => {
 
       if (!stopRef.current) {
         setImages(convertedImages);
+        incrementLimit(); // Count usage only on success
       }
     } catch (error) {
       console.error('PDF Error:', error);
@@ -186,6 +213,14 @@ export const PDFConverter: React.FC<Props> = ({ language }) => {
     });
   };
 
+  const handleScaleChange = (s: number) => {
+    if (s > 1.0) {
+      alert(t.proFeature);
+      return;
+    }
+    setScale(s);
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-4 pb-20 animate-fade-in transition-colors">
       <div className="mb-10 text-center">
@@ -200,7 +235,12 @@ export const PDFConverter: React.FC<Props> = ({ language }) => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-4 space-y-6">
           <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 transition-colors">
-            <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-6">{t.config}</h3>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">{t.config}</h3>
+              <div className="text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded-lg">
+                {t.usageCount.replace('{n}', checkLimit().toString()).replace('{max}', MAX_DAILY_USAGE.toString())}
+              </div>
+            </div>
             
             <div className="space-y-8">
               <div>
@@ -227,10 +267,17 @@ export const PDFConverter: React.FC<Props> = ({ language }) => {
                   {[1.0, 2.0, 3.0].map((s) => (
                     <button
                       key={s}
-                      onClick={() => setScale(s)}
-                      className={`flex-1 py-3 rounded-xl text-xs font-black transition-all ${scale === s ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}
+                      onClick={() => handleScaleChange(s)}
+                      className={`flex-1 py-3 rounded-xl text-xs font-black transition-all flex items-center justify-center space-x-1 ${
+                        scale === s 
+                          ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' 
+                          : s > 1.0 
+                            ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed' 
+                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'
+                      }`}
                     >
-                      {s}x
+                      <span>{s}x</span>
+                      {s > 1.0 && <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>}
                     </button>
                   ))}
                 </div>

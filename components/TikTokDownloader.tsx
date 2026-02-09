@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { TikTokData, HistoryItem, Language } from '../types';
 
 const STORAGE_KEY = 'tiktok_download_history';
+const getUsageKey = () => `supertool_usage_${new Date().toLocaleDateString('en-CA')}`;
+const MAX_DAILY_USAGE = 10;
 
 interface Props {
   language: Language;
@@ -38,6 +40,8 @@ export const TikTokDownloader: React.FC<Props> = ({ language }) => {
       timeJustNow: 'Vừa xong',
       timeMinutes: '{n} phút trước',
       timeHours: '{n} giờ trước',
+      limitReached: 'Bạn đã đạt giới hạn 10 file/ngày của gói FREE. Vui lòng quay lại vào ngày mai hoặc nâng cấp PRO.',
+      usageCount: 'Hôm nay: {n}/{max}'
     },
     en: {
       title: 'TikTok Downloader',
@@ -62,6 +66,8 @@ export const TikTokDownloader: React.FC<Props> = ({ language }) => {
       timeJustNow: 'Just now',
       timeMinutes: '{n} minutes ago',
       timeHours: '{n} hours ago',
+      limitReached: 'You have reached the daily limit of 10 files (FREE plan). Please come back tomorrow or upgrade to PRO.',
+      usageCount: 'Today: {n}/{max}'
     }
   }[language];
 
@@ -75,6 +81,16 @@ export const TikTokDownloader: React.FC<Props> = ({ language }) => {
       }
     }
   }, []);
+
+  const checkLimit = () => {
+    const usage = parseInt(localStorage.getItem(getUsageKey()) || '0', 10);
+    return usage;
+  };
+
+  const incrementLimit = () => {
+    const current = checkLimit();
+    localStorage.setItem(getUsageKey(), (current + 1).toString());
+  };
 
   const saveToHistory = (tiktokData: TikTokData['data'], originalUrl: string) => {
     const newItem: HistoryItem = {
@@ -98,6 +114,13 @@ export const TikTokDownloader: React.FC<Props> = ({ language }) => {
 
   const handleDownload = async (targetUrl: string = url) => {
     if (!targetUrl) return;
+
+    const currentUsage = checkLimit();
+    if (currentUsage >= MAX_DAILY_USAGE) {
+      alert(t.limitReached);
+      return;
+    }
+
     setLoading(true);
     setError('');
     setData(null);
@@ -109,6 +132,7 @@ export const TikTokDownloader: React.FC<Props> = ({ language }) => {
       if (result.code === 0) {
         setData(result.data);
         saveToHistory(result.data, targetUrl);
+        incrementLimit(); // Count usage only on success
       } else {
         setError(result.msg || t.errorNotFound);
       }
@@ -167,7 +191,10 @@ export const TikTokDownloader: React.FC<Props> = ({ language }) => {
     <div className="space-y-8 animate-fade-in max-w-5xl mx-auto pb-10 transition-colors">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-800 p-8 md:p-12 transition-colors">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-800 p-8 md:p-12 transition-colors relative">
+             <div className="absolute top-6 right-8 text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded-lg">
+                {t.usageCount.replace('{n}', checkLimit().toString()).replace('{max}', MAX_DAILY_USAGE.toString())}
+             </div>
             <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-2 text-center tracking-tight uppercase italic">{t.title}</h2>
             <p className="text-gray-500 dark:text-gray-400 mb-10 text-center text-lg font-medium">{t.subtitle}</p>
             
